@@ -1,0 +1,8 @@
+streamlit
+anthropic
+langchain-community
+langchain-text-splitters
+pymupdf
+sentence-transformers
+chromadb
+pandas
