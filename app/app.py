@@ -142,8 +142,13 @@ if user_prompt := st.chat_input():
     # Display the user message
     st.chat_message("human").write(user_prompt)
 
-    # Retrieve relevant documents
-    docs = retriever.get_relevant_documents(user_prompt)
+    
+    # LangChain retrievers: prefer invoke() (new API). Fall back if older method exists.
+try:
+    docs = retriever.invoke(user_prompt)  # preferred
+except Exception:
+    docs = retriever.get_relevant_documents(user_prompt)  # fallback for older versions
+
 
     # Store source documents for display
     sources = []
