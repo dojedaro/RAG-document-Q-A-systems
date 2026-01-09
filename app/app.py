@@ -1,12 +1,3 @@
-# --- Streamlit Cloud sqlite fix for Chroma ---
-try:
-    __import__("pysqlite3")
-    import sys
-    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
-except Exception:
-    pass
-# --------------------------------------------
-
 
 
 import streamlit as st
@@ -16,7 +7,7 @@ import pandas as pd
 import anthropic
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores.chroma import Chroma
+from langchain_community.vectorstores.chroma import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 
@@ -66,19 +57,15 @@ def configure_retriever(uploaded_files):
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-  # Create an in-memory Chroma DB (avoids sqlite/persistence issues on Streamlit Cloud)
-    vectordb = Chroma.from_documents(
-        documents=doc_chunks,
-        embedding=embeddings_model,
-        collection_name="pdf_rag",
-    )
+ # Create embeddings + store vectors in FAISS (no SQLite; Streamlit Cloud friendly)
+    vectordb = FAISS.from_documents(doc_chunks, embeddings_model)
 
-    # Define retriever object
     retriever = vectordb.as_retriever(
         search_type="similarity",
         search_kwargs={"k": 4}
     )
-    return retriever
+return retriever
+
 
 # Streaming handler for Claude responses
 class StreamHandler:
