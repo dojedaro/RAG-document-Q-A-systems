@@ -3,7 +3,6 @@ import streamlit as st
 import os
 import tempfile
 import pandas as pd
-import yaml
 import anthropic
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -11,10 +10,12 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 
-# Load API key from YAML file
-with open('anthropic_api_credentials.yml', 'r') as file:
-    credentials = yaml.safe_load(file)
-    anthropic_api_key = credentials['anthropic_key']
+anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+if not anthropic_api_key:
+    st.error("Missing ANTHROPIC_API_KEY. Please set it in your environment or Streamlit Secrets.")
+    st.stop()
+
+
 
 # Customize initial app landing page
 st.set_page_config(page_title="File QA Chatbot with Claude", page_icon="🤖")
