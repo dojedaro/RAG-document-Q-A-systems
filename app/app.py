@@ -143,11 +143,9 @@ if user_prompt := st.chat_input():
     st.chat_message("human").write(user_prompt)
 
     
-    # LangChain retrievers: prefer invoke() (new API). Fall back if older method exists.
-try:
+    # LangChain retrievers: prefer invoke()
     docs = retriever.invoke(user_prompt)  # preferred
-except Exception:
-    docs = retriever.get_relevant_documents(user_prompt)  # fallback for older versions
+
 
 
     # Store source documents for display
